@@ -79,10 +79,13 @@ public class GestureController : MonoBehaviour
             }
             else
             {
-                if (y < 0)
+                if (y < 0) { 
                     swipeDown = true;
-                else
-                    swipeUp = true;
+                }
+                else { 
+                    Debug.Log("Jump ");
+                swipeUp = true;
+            }
             }
             Reset();
         }
