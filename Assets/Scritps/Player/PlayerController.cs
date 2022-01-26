@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     public GestureController gesture;
     public CharacterController character;
     public Animator animator;
+    public GameObject coinCountTxt;
     float newXPos = 0f;
     public float moveSpeed = 3;
     public float leftRightSpeed = 4;
@@ -21,6 +22,7 @@ public class PlayerController : MonoBehaviour
     private float collHeight;
     private float collCenterY;
 
+    public int coinCoint;
     public float duration = 0.08f;
     public float inxPos;
     public float dodgeSpeed;
@@ -105,7 +107,7 @@ public class PlayerController : MonoBehaviour
                 yPos -= 10;
                 character.center = new Vector3(0, collCenterY/2, 0);
                 character.height = collHeight/2;
-                animator.CrossFadeInFixedTime("Dive", 0.1f);
+                animator.CrossFadeInFixedTime("Rolling", 0.1f);
                 isJump = false;
                 isRoll = true;
             }
@@ -117,23 +119,24 @@ public class PlayerController : MonoBehaviour
     {
         if (IsGrounded())
         {
-            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Falling"))
-            {
+            //if (animator.GetCurrentAnimatorStateInfo(0).IsName("Falling"))
+            //{
                 //animator.Play("Dive");
-                isJump = false;
-            }
+                //isJump = false;
+            //}
             if (gesture.SwipeUp)
             {
                 yPos = jumpHeight;
-                animator.CrossFadeInFixedTime("Jump", 0.1f);
+                animator.CrossFadeInFixedTime("Jump", 0.01f);
                 isJump = true;
             }
         }
         else
         {
             yPos -= jumpHeight * 2 * Time.deltaTime;
-            if (character.velocity.y < -0.1f)
-                animator.Play("Jump");
+            if (character.velocity.y < -1f)
+                isJump = false;
+            //animator.Play("Falling");
         }
     }
 
@@ -176,5 +179,12 @@ public class PlayerController : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        //this.gameObject.SetActive(false);
+        coinCoint += 1;
+        //coinCountTxt.text = "" + coinCoint;
     }
 }
