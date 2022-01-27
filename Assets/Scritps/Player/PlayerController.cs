@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum SIDE { Left, Mid, Right }
 public class PlayerController : MonoBehaviour
@@ -10,7 +11,7 @@ public class PlayerController : MonoBehaviour
     public GestureController gesture;
     public CharacterController character;
     public Animator animator;
-    public GameObject coinCountTxt;
+    public Text coinCountTxt;
     float newXPos = 0f;
     public float moveSpeed = 3;
     public float leftRightSpeed = 4;
@@ -22,7 +23,7 @@ public class PlayerController : MonoBehaviour
     private float collHeight;
     private float collCenterY;
 
-    public int coinCoint;
+    public int coinCount;
     public float duration = 0.08f;
     public float inxPos;
     public float dodgeSpeed;
@@ -48,7 +49,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed, Space.World);
+        // transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed, Space.World);
 
         if (gesture.SwipeLeft)
         {
@@ -80,13 +81,16 @@ public class PlayerController : MonoBehaviour
                 animator.Play("Right");
             }
         }
-        Vector3 moveVector = new Vector3(xPos - transform.position.x, yPos * Time.deltaTime, runSpeed * Time.deltaTime);
-        xPos = Mathf.Lerp(xPos, newXPos, Time.deltaTime * dodgeSpeed);
-        character.Move(moveVector);
         Jump();
         Roll();
     }
 
+    void FixedUpdate()
+    {
+        Vector3 moveVector = new Vector3(xPos - transform.position.x, yPos * Time.deltaTime, runSpeed * Time.deltaTime);
+        xPos = Mathf.Lerp(xPos, newXPos, Time.deltaTime * dodgeSpeed);
+        character.Move(moveVector);
+    }
 
     public void Roll()
     {
@@ -103,10 +107,10 @@ public class PlayerController : MonoBehaviour
             }
             if (gesture.SwipeDown)
             {
-                rollCounter = 0.2f;
+                rollCounter = 0.5f;
                 yPos -= 10;
-                character.center = new Vector3(0, collCenterY/2, 0);
-                character.height = collHeight/2;
+                character.center = new Vector3(0, collCenterY / 2, 0);
+                character.height = collHeight / 2;
                 animator.CrossFadeInFixedTime("Rolling", 0.1f);
                 isJump = false;
                 isRoll = true;
@@ -119,11 +123,11 @@ public class PlayerController : MonoBehaviour
     {
         if (IsGrounded())
         {
-            //if (animator.GetCurrentAnimatorStateInfo(0).IsName("Falling"))
-            //{
-                //animator.Play("Dive");
-                //isJump = false;
-            //}
+            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Falling"))
+            {
+                // animator.Play("Dive");
+                isJump = false;
+            }
             if (gesture.SwipeUp)
             {
                 yPos = jumpHeight;
@@ -133,10 +137,11 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            yPos -= jumpHeight * 2 * Time.deltaTime;
+            yPos += -jumpHeight * Time.deltaTime * 2;
+            // yPos -= jumpHeight * 2 * Time.deltaTime;
             if (character.velocity.y < -1f)
-                isJump = false;
-            //animator.Play("Falling");
+                // isJump = false;
+                animator.Play("Falling");
         }
     }
 
@@ -183,8 +188,11 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        //this.gameObject.SetActive(false);
-        coinCoint += 1;
-        //coinCountTxt.text = "" + coinCoint;
+        if (other.tag == "Coin")
+        {
+            coinCount += 1;
+            other.gameObject.SetActive(false);
+            coinCountTxt.text = "" + coinCount;
+        }
     }
 }

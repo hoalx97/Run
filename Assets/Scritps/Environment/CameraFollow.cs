@@ -5,26 +5,20 @@ public class CameraFollow : MonoBehaviour
     public Transform target;
     public float smoothSpeed = 0.125f;
 
-    private Vector3 velocity = Vector3.zero;
     public Vector3 offset;
-    public float speedFollow = 5f;
-    private float maxHeightOffset;
 
 
-    void LateUpdate()
+    void FixedUpdate()
     {
-        Vector3 followPos = target.position + offset;
+        Vector3 desiredPosition = target.position + offset;
+        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
+        transform.position = smoothedPosition;
 
-        RaycastHit hit;
-        if (Physics.Raycast(target.position, Vector3.down, out hit, 2.5f))
-        {
-            maxHeightOffset = Mathf.Lerp(maxHeightOffset, hit.point.y, Time.deltaTime * speedFollow);
-        }else
-        {
-            maxHeightOffset = Mathf.Lerp(maxHeightOffset, target.position.y, Time.deltaTime * speedFollow);
-        }
-        followPos.y = offset.y + maxHeightOffset;
-        transform.position = followPos;
+        // transform.LookAt(target + offset);
     }
 
+    // void LateUpdate()
+    // {
+    //     transform.position = Vector3.Lerp(transform.position, target.position + offset, 10f * Time.deltaTime);
+    // }
 }
